@@ -1,19 +1,21 @@
 <?php
 get_header(); // Include your header template
+
 ?>
 
 <div class="container mt-3 mb-5">
     <div class="row">
         <div class="col-md-12">
-            <?php custom_breadcrumbs(); // Include your custom breadcrumb function 
+            <?php custom_breadcrumbs(); // Include your custom breadcrumb function
             ?>
         </div>
     </div>
 
-    <div class="row image-gallery-grid">
+    <div class="row image-gallery-grid align-items-center">
         <div class="col-md-12">
-            <h1><?php the_title(); ?></h1>
+            <h1 class="d-inline"><?php the_title(); ?></h1>
         </div>
+
     </div>
 
     <div class="row">
@@ -43,15 +45,12 @@ get_header(); // Include your header template
 
     <?php
 
-
-
     $title1_object = get_field_object('alinea_1_titel'); // Replace 'field_name' with your ACF field's name
     $title1_label = $title1_object['label'];
     $title1_value = $title1_object['value'];
     $desc1_object = get_field_object('alinea_1_tekst'); // Replace 'field_name' with your ACF field's name
     $desc1_label = $desc1_object['label'];
     $desc1_value = $desc1_object['value'];
-
 
     $title2_object = get_field_object('alinea_2_titel'); // Replace 'field_name' with your ACF field's name
     $title2_label = $title2_object['label'];
@@ -63,19 +62,19 @@ get_header(); // Include your header template
     ?>
 
     <div class="row mt-5">
-
         <div class="col-md-7">
             <div class="title-desc-1">
-                <div class="location-title">
+                <div class="location-desc-label">
                     <h3 class="location-text">Locatie omschrijving</h3>
-                    <h4 class="location-title-label"><?php echo $title1_label; ?></h4>
-                    <p class="location-title-val"><?php echo $title1_value; ?></p>
                 </div>
-                <div class="location-desc">
-                    <h4 class="location-desc-label"><?php echo $desc1_label; ?></h4>
-                    <p class="location-desc-val"><?php echo $desc1_value; ?></p>
-                </div>
+                <h4 class="location-title-label"><?php echo $title1_label; ?></h4>
+                <p class="location-title-val"><?php echo $title1_value; ?></p>
             </div>
+            <div class="location-desc">
+                <h4 class="location-desc-label"><?php echo $desc1_label; ?></h4>
+                <p class="location-desc-val"><?php echo $desc1_value; ?></p>
+            </div>
+
 
             <div class="title-desc-2">
                 <div class="location-title">
@@ -90,30 +89,20 @@ get_header(); // Include your header template
 
 
             <div class="faciliteiten-item ">
-
-
                 <div class="faciliteiten-headerm mt-3 mb-3">
-
-
                     <div class="row align-items-center">
-                        <div class="col-md-9">
+                        <div class="col-md-12">
                             <h3>Faciliteiten</h3>
                             <p class=""> Faciliteiten Selecteer hier wat uw locatie te bieden heeft.</p>
-
                         </div>
-                        <div class="col-md-3">
-                           <a href="" class="btn btn-info">Click for edit</a>
-                        </div>
+                        
                     </div>
-
-
                 </div>
 
                 <?php
 
                 $faciliteiten_data = get_field('faciliteiten');
-                $faciliteiten_items =  $faciliteiten_data['faciliteiten_items'];
-
+                $faciliteiten_items = $faciliteiten_data['faciliteiten_items'];
 
                 if (!empty($faciliteiten_items)) {
                     echo '<div class="row">';
@@ -151,32 +140,17 @@ get_header(); // Include your header template
                 }
 
                 ?>
-
-
-
-
-
-
-
-
             </div>
-
-
-
-
-
         </div>
-
-    
 
         <div class="col-md-5 ">
             <div class="right-side-location-contact bg-success text-white p-3">
 
-                <h3>Locatiegegevens <span class="text-info"> edit</span></h3>
+                <div class="locatiion-header">
+                    <h3 class="d-inline">Locatiegegevens </h3>
+                </div>
 
                 <div class="Locatiegegevens-item">
-
-
                     <?php
                     $desc_title_1 = get_field('alinea_1_titel');
                     $desc_location_data = get_field('Locatiegegevens');
@@ -206,25 +180,18 @@ get_header(); // Include your header template
                     }
                     ?>
 
-
-
-
-
-
-
-
                 </div>
 
                 <div class="Contactgegevens-item">
 
                     <h3>Contactgegevens</h3>
 
+
+
                     <?php
 
                     $contact_location_data = get_field('Contactgegevens');
                     $contactgegevens_items = $contact_location_data['contactgegevens_items'];
-
-
 
                     echo '<ul class="list-unstyled mb-3" >';
                     foreach ($contactgegevens_items as $contact_location_item) {
@@ -248,17 +215,16 @@ get_header(); // Include your header template
                     }
                     echo '</ul>';
 
-
                     ?>
                 </div>
 
                 <!-- You can add other post-related information here -->
                 <a href="<?php the_permalink(); ?>" class="btn btn-primary">Bekijk locatie</a>
             </div>
-            
+
             <div class="book-now-for-manager-section">
                 <div class="p-3">
-                    <a href="http://localhost:10038/booking/?id=<?php the_ID(); ?>"  class="btn btn-success text-white h3">Book Now</a>
+                    <a href="http://localhost:10038/booking/?location_id=<?php the_ID(); ?>" class="btn btn-success text-white h3">Book Now</a>
                 </div>
             </div>
         </div>
