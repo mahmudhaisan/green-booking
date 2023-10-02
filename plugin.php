@@ -26,6 +26,9 @@ add_action('wp_enqueue_scripts', 'grbp_custom_enqueue_assets');
 // Enqueue CSS and JavaScript
 function grbp_custom_enqueue_assets()
 {
+    $api_key = 'AIzaSyDDGe4dCxn9exk8KpvF6Fr6bDh-rpvTJpw';
+
+
     //css
     wp_enqueue_style('bootstrap-min', plugin_dir_url(__FILE__) . 'assets/css/bootstrap.min.css');
     wp_enqueue_style('style-css-ss', plugin_dir_url(__FILE__) . 'assets/css/style.css');
@@ -33,6 +36,13 @@ function grbp_custom_enqueue_assets()
 
     //js
     wp_enqueue_script('bootstrap-min', plugin_dir_url(__FILE__) . 'assets/js/bootstrap.min.js', array('jquery'), '1.0.0', true);
+    wp_enqueue_script('chartjs', plugin_dir_url(__FILE__) . 'assets/js/chart.min.js', array('jquery'), '3.7.0', true);
+    // Replace 'YOUR_API_KEY' with your actual Google Maps API key
+
+
+    // Enqueue the Google Maps Embed API script
+    wp_enqueue_script('google-maps-embed-api', "https://maps.googleapis.com/maps/api/js?key={$api_key}&callback=initMap&libraries=places", array(), null, true);
+
 
     wp_enqueue_script('script', plugin_dir_url(__FILE__) . 'assets/js/script.js', array('jquery'), '1.0.0', true);
     wp_localize_script(
@@ -42,6 +52,8 @@ function grbp_custom_enqueue_assets()
             'ajaxurl' => admin_url('admin-ajax.php'),
         )
     );
+
+    wp_enqueue_media();
 }
 
 add_action('admin_enqueue_scripts', 'grbp_custom_enqueue_admin_assets');
@@ -61,7 +73,7 @@ function grbp_custom_enqueue_admin_assets()
 function custom_post_type_locations()
 {
     $labels = array(
-        'name' => _x('Locations', 'Post Type General Name', 'text_domain'),
+        'name' => _x('Locaties', 'Post Type General Name', 'text_domain'),
         'singular_name' => _x('Location', 'Post Type Singular Name', 'text_domain'),
         'menu_name' => __('Locations', 'text_domain'),
         'name_admin_bar' => __('Location', 'text_domain'),
@@ -130,17 +142,29 @@ function create_archive_template($archive_template)
 function locations_single_template($template)
 {
 
-    $manager_accees_object = get_field_object('manager-edit-access');
-    if ($manager_accees_object) {
-        $manager_accees_value = $manager_accees_object['value'];
-    }
 
-    if ($manager_accees_value == 'Yes' &&  is_singular('locations')) {
+
+  
+    // Get the current user's ID.
+    $current_user_id = get_current_user_id();
+
+    if (is_user_logged_in() && $current_user_id) {
+        // Get the post ID for the current single CPT page.
+        $post_id = get_the_ID();
+
+        // Get the value of the 'location_access_user_id' post meta key for this post.
+        $location_access_user_id = get_post_meta($post_id, 'location_access_user_id', true);
+
+        if ($location_access_user_id && $current_user_id == $location_access_user_id && is_singular('locations')) {
             $template = plugin_dir_path(__FILE__) . 'templates/location-single-post-edit.php';
-    }else{
+        } else {
+            $template = plugin_dir_path(__FILE__) . 'templates/location-single-post.php';
+        }
+    } else {
         $template = plugin_dir_path(__FILE__) . 'templates/location-single-post.php';
-
     }
+
+
     return $template;
 }
 add_filter('single_template', 'locations_single_template');
@@ -150,16 +174,25 @@ function booking_form_cb()
 {
     ob_start();
     $location_id = isset($_GET['location_id']) ? $_GET['location_id'] : '';
-    if ($location_id) {
-        include GRBP_PLUGINS_PATH . '/template-parts/booking-form-html.php';
+    $success_id = isset($_GET['success']) ? $_GET['success'] : '';
+
+    if ($success_id == 'true') {
+        echo '<h1 class="mt-5">Uw boeking is doorgegeven!</h1>';
+        echo '<p class="mb-5">U kunt direct het aantal gespaarde bomen, en de details van de boeking, terugzien in uw omgeving. Klik hier om terug te keren naar uw omgeving.</p>';
     } else {
-        return 'Error: Location parameter does not equal "wp"';
+
+        if (is_user_logged_in()) {
+            include GRBP_PLUGINS_PATH . '/template-parts/booking-form-html.php';
+        } else {
+            echo '<div class="mt-5 mb-5 h1"> U mag niet boeken. U moet manager zijn om te kunnen boeken</div>';
+        }
     }
 
     return ob_get_clean();
 }
 
 add_shortcode('booking-form', 'booking_form_cb');
+
 
 include GRBP_PLUGINS_PATH . '/functions.php';
 
@@ -169,17 +202,71 @@ if (is_admin() && defined('DOING_AJAX') && DOING_AJAX) {
 
 function green_booking_dashboard_menu()
 {
-    add_menu_page('Settings', 'Green Booking', 'manage_options', 'green-booking-settings', 'green_booking_settings_cb');
+    add_menu_page('Booking', 'Green Booking', 'manage_options', 'green-booking-settings', 'render_booking_options_page');
 }
 add_action('admin_menu', 'green_booking_dashboard_menu');
 
-function green_booking_settings_cb()
+function create_booking_options_table()
 {
-    ?>
-    <div class="wrap">
-        <h1>Welcome to green booking settings</h1>
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'booking_options';
 
-    <?php
+    $charset_collate = $wpdb->get_charset_collate();
+
+    $sql = "CREATE TABLE $table_name (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        location_name varchar(255) NOT NULL,
+        user_name varchar(255) NOT NULL,
+        total_amount decimal(10, 2) NOT NULL,
+        total_trees int(11) NOT NULL,
+        event_date datetime NOT NULL,
+        created_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    dbDelta($sql);
+}
+
+register_activation_hook(__FILE__, 'create_booking_options_table');
+
+
+
+add_shortcode('result-locaties-page', 'result_locaties_page_cb');
+
+function result_locaties_page_cb()
+{
+
+    include GRBP_PLUGINS_PATH . '/views/results/results-locations.php';
 }
 
 
+add_shortcode('result-boekers-page', 'result_bookers_page_cb');
+
+function result_bookers_page_cb()
+{
+
+    include GRBP_PLUGINS_PATH . '/views/results/results-bookers.php';
+}
+
+
+add_shortcode('locatie-login', 'locatie_login_cb');
+
+function locatie_login_cb()
+{
+
+
+    include GRBP_PLUGINS_PATH . '/views/location/login.php';
+}
+
+
+
+
+add_shortcode('all-bookings-details', 'all_bookings_details_cb');
+
+function all_bookings_details_cb()
+{
+
+
+    include GRBP_PLUGINS_PATH . '/views/bookings/all-bookings.php';
+}

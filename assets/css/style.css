@@ -4,7 +4,7 @@ img.location-image {
 }
 
 #page {
-    background-color: #f1f4f4;
+    background-color: #f1f4f4 !important;
 }
 
 .location-filter-top {
@@ -38,3 +38,98 @@ img.location-image {
 span.select2.select2-container {
     width: 50% !important;
 }
+
+.fixed-right-card{
+    top: 310px; /* Adjust the top position as needed */
+    /* width: 100%; Make the section full width */
+    background-color: #f8f9fa; /* Change the background color as desired */
+    /* z-index: 1000; Set a higher z-index to ensure it appears above other content */
+    padding: 20px; /* Add padding as needed */
+    /* Additional styles as needed */
+}
+
+/* Example spinner CSS */
+.spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+.latest-location-image{
+    height: 170px !important;
+}
+
+:root {
+    --primary-color: #0C474F; /* Blue */
+  }
+
+  /* You can use the primary color variable in your styles like this */
+.btn-primary {
+    background-color: var(--primary-color);
+    /* Other styles for primary buttons */
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+    color: #fff;
+    /* Other styles for primary buttons */
+}
+
+.th-custom {
+    font-size: 18px; /* Adjust the font size as needed */
+    padding: 10px; /* Adjust the padding as needed */
+}
+
+.tr-custom {
+    font-size: 16px; /* Adjust the font size as needed */
+    padding: 8px; /* Adjust the padding as needed */
+}
+.td-custom {
+    font-size: 14px; /* Adjust the font size as needed */
+    padding: 8px; /* Adjust the padding as needed */
+}
+#location-input::placeholder {
+    color: transparent !important; /* or you can use "color: rgba(0, 0, 0, 0);" for transparent text */
+}
+
+.location-feature-image{
+    width: 100% !important;
+    height: 300px !important;
+}
+
+
+/* Spinner container */
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Spinner animation */
+  .spinner {
+    border: 4px solid rgba(0, 0, 0, 0.3);
+    border-top: 4px solid #007bff; /* Change the spinner color as needed */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 2s linear infinite;
+    margin-bottom: 10px;
+  }
+  
+  /* Spinner keyframes animation */
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  

@@ -88,145 +88,125 @@ get_header(); // Include your header template
             </div>
 
 
-            <div class="faciliteiten-item ">
+            <div class="faciliteiten-item mt-5">
                 <div class="faciliteiten-headerm mt-3 mb-3">
                     <div class="row align-items-center">
                         <div class="col-md-12">
                             <h3>Faciliteiten</h3>
                             <p class=""> Faciliteiten Selecteer hier wat uw locatie te bieden heeft.</p>
                         </div>
-                        
+
                     </div>
                 </div>
 
-                <?php
+                <div>
 
-                $faciliteiten_data = get_field('faciliteiten');
-                $faciliteiten_items = $faciliteiten_data['faciliteiten_items'];
 
-                if (!empty($faciliteiten_items)) {
-                    echo '<div class="row">';
-                    $count = 0;
+                    <?php
+                    $faciliteiten_items = get_field('location-facilities');
 
-                    foreach ($faciliteiten_items as $faciliteiten_item) {
-                        if ($count % 2 == 0) {
-                            // Start a new row
-                            echo '</div><div class="row">';
+                    // print_r($faciliteiten_items);
+                    // Define a generic mapping of labels to Font Awesome icons
+                    $generic_mapping = [
+                        'Geluidsinstallatie' => 'fa-microphone',
+                        'Extra schermen/plug & play' => 'fa-desktop',
+                        'Catering' => 'fa-utensils',
+                        'Bar' => 'fa-wine-glass',
+                        'Restaurant' => 'fa-utensils', // Example mapping, you can change this
+                        'Invalidetoegankelijk' => 'fa-wheelchair',
+                        'Overnachten' => 'fa-bed',
+                        'VIP (hele locatie huren)' => 'fa-crown',
+                        'Gratis parkeren' => 'fa-car',
+                        'Vlakbij OV' => 'fa-bus',
+                        'EV laadpaal' => 'fa-charging-station',
+                        // Add more mappings as needed
+                    ];
+                    
+
+                    if (!empty($faciliteiten_items)) {
+                        echo '<div class="row">';
+                        $count = 0;
+
+                        foreach ($faciliteiten_items as $item) {
+                            $faciliteiten_item_value = $item['value'];
+
+                            if ($count % 2 == 0) {
+                                // Start a new row
+                                echo '</div><div class="row">';
+                            }
+
+                            echo '<div class="col-md-6">';
+                            echo '<ul class="list-unstyled mb-3">';
+
+                            echo '<li>';
+
+                            // Display the Font Awesome icon based on the label
+                            if (isset($generic_mapping[$faciliteiten_item_value])) {
+                                $icon_class = $generic_mapping[$faciliteiten_item_value];
+                                echo '<i class="fas ' . $icon_class . '"></i> ';
+                            }
+
+                            // Display the facility label
+                            if ($faciliteiten_item_value) {
+                                echo $faciliteiten_item_value;
+                            }
+
+                            echo '</li>';
+
+                            echo '</ul>';
+                            echo '</div>';
+                            $count++;
                         }
 
-                        echo '<div class="col-md-6">';
-                        echo '<ul class="list-unstyled mb-3">';
-
-                        echo '<li>';
-
-                        // Display the image on the left
-                        if ($faciliteiten_item['faciliteiten_image']) {
-                            echo '<img src="' . $faciliteiten_item['faciliteiten_image'] . '" alt="Location Image" class="location-image mr-3">';
-                        }
-
-                        // Display the other field value on the right
-                        if ($faciliteiten_item['faciliteiten_name']) {
-                            echo '<span class="faciliteiten_name mb-3">' . esc_html($faciliteiten_item['faciliteiten_name']) . '</span>';
-                        }
-
-                        echo '</li>';
-
-                        echo '</ul>';
                         echo '</div>';
-                        $count++;
                     }
+                    ?>
 
-                    echo '</div>';
-                }
+                </div>
 
-                ?>
+
             </div>
         </div>
 
         <div class="col-md-5 ">
-            <div class="right-side-location-contact bg-success text-white p-3">
+            <div class="right-side-location-contact bg-primary text-white p-3">
 
-                <div class="locatiion-header">
-                    <h3 class="d-inline">Locatiegegevens </h3>
-                </div>
+
+
 
                 <div class="Locatiegegevens-item">
+                    <h3 class="d-inline">Locatiegegevens </h3>
+
                     <?php
-                    $desc_title_1 = get_field('alinea_1_titel');
-                    $desc_location_data = get_field('Locatiegegevens');
 
-                    if ($desc_title_1 && $desc_location_data) {
-                        $locatiegegevens_items = $desc_location_data['locatiegegevens_items'];
-                        if (!empty($locatiegegevens_items)) {
-                            echo '<ul class="list-unstyled mb-3" >';
-                            foreach ($locatiegegevens_items as $desc_location_item) {
-                                echo '<li>';
 
-                                // echo $desc_location_item['locatiegegevens_image'];
-                                // Display the image on the left
-                                if ($desc_location_item['locatiegegevens_image']) {
-                                    echo '<img src="' . $desc_location_item['locatiegegevens_image'] . '" alt="Location Image" class="location-image mr-3">';
-                                }
+                    $locations_data = get_field('locations_data');
 
-                                // Display the other field value on the right
-                                if ($desc_location_item['locatiegegevens_name']) {
-                                    echo '<span class="locatiegegevens_name mb-3">' . esc_html($desc_location_item['locatiegegevens_name']) . '</span>';
-                                }
-
-                                echo '</li>';
-                            }
-                            echo '</ul>';
-                        }
-                    }
                     ?>
+                    <p class="location-name-icon mt-3"><i class="fas fa-location-pin"></i> <?php echo $locations_data['location_name_text']; ?></p>
+                    <p class="location-name-icon"><i class="fas fa-globe"></i> <?php echo  $locations_data['location_website_url']; ?></p>
+                    <p class="location-name-icon"><i class="fas fa-users"></i> <?php echo $locations_data['location_persons_number']; ?></p>
+                    <p class="location-name-icon"><i class="fas fa-building"></i> <?php echo $locations_data['location_rooms_number']; ?></p>
+
+
 
                 </div>
 
                 <div class="Contactgegevens-item">
-
-                    <h3>Contactgegevens</h3>
-
-
-
+                    <h3 class="d-inline">Contactgegevens </h3>
                     <?php
-
-                    $contact_location_data = get_field('Contactgegevens');
-                    $contactgegevens_items = $contact_location_data['contactgegevens_items'];
-
-                    echo '<ul class="list-unstyled mb-3" >';
-                    foreach ($contactgegevens_items as $contact_location_item) {
-
-                        // var_dump($contact_location_item);
-
-                        echo '<li>';
-
-                        // echo $desc_location_item['contactgegevens_image'];
-                        // Display the image on the left
-                        if ($contact_location_item['contactgegevens_image']) {
-                            echo '<img src="' . $contact_location_item['contactgegevens_image'] . '" alt="Location Image" class="location-image mr-3">';
-                        }
-
-                        // Display the other field value on the right
-                        if ($contact_location_item['contactgegevens_name']) {
-                            echo '<span class="contactgegevens_name mb-3">' . esc_html($contact_location_item['contactgegevens_name']) . '</span>';
-                        }
-
-                        echo '</li>';
-                    }
-                    echo '</ul>';
+                    $contacts_info = get_field('contacts_info');
 
                     ?>
+                    <p class="location-name-icon mt-3"><i class="fas fa-phone"></i> <?php echo $contacts_info['location_phone']; ?></p>
+                    <p class="location-name-icon"><i class="fas fa-envelope"></i> <?php echo $contacts_info['location_email']; ?></p>
+
                 </div>
 
                 <!-- You can add other post-related information here -->
                 <a href="<?php the_permalink(); ?>" class="btn btn-primary">Bekijk locatie</a>
             </div>
 
-            <div class="book-now-for-manager-section">
-                <div class="p-3">
-                    <a href="http://localhost:10038/booking/?location_id=<?php the_ID(); ?>" class="btn btn-success text-white h3">Book Now</a>
-                </div>
-            </div>
         </div>
     </div>
 

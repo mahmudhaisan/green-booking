@@ -3,7 +3,8 @@ get_header(); // Include your header template
 
 
 $location_post_id = get_the_ID();
-
+$locations_data = get_field('locations_data');
+$contacts_info = get_field('contacts_info');
 
 ?>
 
@@ -58,6 +59,8 @@ $location_post_id = get_the_ID();
                 the_post_thumbnail('large', ['class' => 'img-fluid']);
             }
             ?>
+            <button id="change-featured-image" class="mt-3 bg-primary border-0">Change Featured Image</button>
+
         </div>
         <div class="col-md-5">
             <?php
@@ -73,7 +76,16 @@ $location_post_id = get_the_ID();
             }
             echo '</div>';
             ?>
+            <button id="change-gallery" class="bg-primary border-0">Change Featured Image</button>
+
+
+
+
         </div>
+
+
+
+
     </div>
 
     <?php
@@ -121,7 +133,7 @@ $location_post_id = get_the_ID();
             </div>
 
 
-            <div class="faciliteiten-item ">
+            <div class="faciliteiten-item mt-5">
                 <div class="faciliteiten-headerm mt-3 mb-3">
                     <div class="row align-items-center">
                         <div class="col-md-9">
@@ -138,66 +150,63 @@ $location_post_id = get_the_ID();
                             <div class="modal fade" id="facilitiesEditModal" tabindex="-1" role="dialog" aria-labelledby="facilitiesEditModalLabel" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="facilitiesEditModalLabel">Edit Facilities Data</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label class="form-check-label">
-                                                        <input type="checkbox" class="form-check-input" value="Option 1"> Option 1
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-check-label">
-                                                        <input type="checkbox" class="form-check-input" value="Option 2"> Option 2
-                                                    </label>
-                                                </div>
+                                        <form action="" method="post">
+
+
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="facilitiesEditModalLabel">Edit Facilities Data</h5>
+                                                <button type="button" class="btn btn-primary" id="saveFacilities">Save Changes</button>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label class="form-check-label">
-                                                        <input type="checkbox" class="form-check-input" value="Option 3"> Option 3
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-check-label">
-                                                        <input type="checkbox" class="form-check-input" value="Option 4"> Option 4
-                                                    </label>
-                                                </div>
+
+                                            <div class="modal-body">
+                                                <?php
+                                                // Retrieve and display the available choices from your ACF field
+                                                $field = get_field_object('location-facilities');
+                                                if ($field['type'] === 'checkbox') {
+                                                    $choices = $field['choices'];
+                                                    $selected_values = get_field('location-facilities'); // Get the selected values
+
+
+
+
+                                                    foreach ($choices as $value) {
+
+
+
+                                                        echo '<div class="form-check">';
+                                                        echo '<input type="checkbox" class="form-check-input" id="' . esc_attr($value) . '" value="' . esc_attr($value) . '"';
+
+                                                        // Check if the current option is selected
+                                                        $isOptionSelected = false;
+                                                        if (is_array($selected_values)) {
+                                                            foreach ($selected_values as $selectedOption) {
+                                                                if ($selectedOption['value'] === $value) {
+                                                                    $isOptionSelected = true;
+                                                                    break; // Exit the loop if the option is found
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if ($isOptionSelected) {
+                                                            echo ' checked="checked"';
+                                                        }
+
+
+                                                        echo '>';
+                                                        echo '<label class="form-check-label" for="' . esc_attr($value) . '">' . ($value) . '</label>';
+                                                        echo '</div>';
+                                                    }
+                                                }
+                                                ?>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label class="form-check-label">
-                                                        <input type="checkbox" class="form-check-input" value="Option 5"> Option 5
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-check-label">
-                                                        <input type="checkbox" class="form-check-input" value="Option 6"> Option 6
-                                                    </label>
-                                                </div>
+
+
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary close" data-dismiss="modal">Close</button>
+
                                             </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label class="form-check-label">
-                                                        <input type="checkbox" class="form-check-input" value="Option 7"> Option 7
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-check-label">
-                                                        <input type="checkbox" class="form-check-input" value="Option 8"> Option 8
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            <button type="button" class="btn btn-primary">Save Changes</button>
-                                        </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -208,64 +217,81 @@ $location_post_id = get_the_ID();
                 </div>
 
 
-                <?php
-
-                $faciliteiten_data = get_field('location-facilities');
-                $faciliteiten_items = get_field('location-facilities');
+                <div class="">
 
 
-                if (!empty($faciliteiten_items)) {
-                    echo '<div class="row">';
-                    $count = 0;
+                    <?php
+                    $faciliteiten_items = get_field('location-facilities');
 
-                    foreach ($faciliteiten_items as $item) {
-                        $faciliteiten_item_value = $item['value'];
-                        $faciliteiten_item_label = $item['label'];
+                    // print_r($faciliteiten_items);
+                    // Define a generic mapping of labels to Font Awesome icons
+                    $generic_mapping = [
+                        'Geluidsinstallatie' => 'fa-microphone',
+                        'Extra schermen/plug & play' => 'fa-desktop',
+                        'Catering' => 'fa-utensils',
+                        'Bar' => 'fa-wine-glass',
+                        'Restaurant' => 'fa-utensils', // Example mapping, you can change this
+                        'Invalidetoegankelijk' => 'fa-wheelchair',
+                        'Overnachten' => 'fa-bed',
+                        'VIP (hele locatie huren)' => 'fa-crown',
+                        'Gratis parkeren' => 'fa-car',
+                        'Vlakbij OV' => 'fa-bus',
+                        'EV laadpaal' => 'fa-charging-station',
+                        // Add more mappings as needed
+                    ];
 
 
-                        if ($count % 2 == 0) {
-                            // Start a new row
-                            echo '</div><div class="row">';
+                    if (!empty($faciliteiten_items)) {
+                        echo '<div class="row">';
+                        $count = 0;
+
+                        foreach ($faciliteiten_items as $item) {
+                            $faciliteiten_item_value = $item['value'];
+
+                            if ($count % 2 == 0) {
+                                // Start a new row
+                                echo '</div><div class="row">';
+                            }
+
+                            echo '<div class="col-md-6">';
+                            echo '<ul class="list-unstyled mb-3">';
+
+                            echo '<li>';
+
+                            // Display the Font Awesome icon based on the label
+                            if (isset($generic_mapping[$faciliteiten_item_value])) {
+                                $icon_class = $generic_mapping[$faciliteiten_item_value];
+                                echo '<i class="fas ' . $icon_class . '"></i> ';
+                            }
+
+                            // Display the facility label
+                            if ($faciliteiten_item_value) {
+                                echo $faciliteiten_item_value;
+                            }
+
+                            echo '</li>';
+
+                            echo '</ul>';
+                            echo '</div>';
+                            $count++;
                         }
 
-                        echo '<div class="col-md-6">';
-                        echo '<ul class="list-unstyled mb-3">';
-
-                        echo '<li>';
-
-                        // Display the image on the left
-                        if ($faciliteiten_item_value) {
-                            echo $faciliteiten_item_value;
-                        }
-
-                        echo ' ';
-
-                        // Display the other field value on the right
-                        if ($faciliteiten_item_label) {
-                            echo $faciliteiten_item_label;
-                        }
-
-                        echo '</li>';
-
-                        echo '</ul>';
                         echo '</div>';
-                        $count++;
                     }
+                    ?>
 
-                    echo '</div>';
-                }
+                </div>
 
-                ?>
             </div>
         </div>
 
         <div class="col-md-5 ">
-            <div class="right-side-location-contact bg-success text-white p-3">
+            <div class="right-side-location-contact bg-primary text-white p-4">
 
                 <div class="locatiion-header">
                     <h3 class="d-inline">Locatiegegevens </h3>
                     <!-- Button to trigger the modal -->
-                    <button class="btn d-inline btn-success btn-lg" id="location-data">
+                    <button class="btn d-inline btn-primary border-0 btn-lg" id="location-data">
                         Edit <i class="fas fa-edit"></i>
                     </button>
 
@@ -284,40 +310,25 @@ $location_post_id = get_the_ID();
                                         <!-- Location Form Fields -->
                                         <div class="form-group">
                                             <label for="location-name">Location Name:</label>
-                                            <input type="text" class="form-control" id="location-name" name="location_name" placeholder="Enter location name">
+                                            <input type="text" class="form-control" id="location-name" name="location_name" placeholder="Enter location name" value="<?php echo esc_attr($locations_data['location_name_text']); ?>">
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="location-address">Website:</label>
-                                            <input type="text" class="form-control" id="location-website" name="location_website" placeholder="Enter Website">
+                                            <label for="location-website">Website:</label>
+                                            <input type="text" class="form-control" id="location-website" name="location_website" placeholder="Enter Website" value="<?php echo esc_attr($locations_data['location_website_url']); ?>">
                                         </div>
 
                                         <div class="form-group">
                                             <label for="location-person">Location Person:</label>
-                                            <input type="text" class="form-control" id="location-person" name="location_person" placeholder="Enter Location Person">
+                                            <input type="text" class="form-control" id="location-person" name="location_person" placeholder="Enter Location Person" value="<?php echo esc_attr($locations_data['location_persons_number']); ?>">
                                         </div>
 
                                         <div class="form-group">
                                             <label for="location-rooms">Location Rooms:</label>
-                                            <input type="text" class="form-control" id="location-rooms" name="location_rooms" placeholder="Enter Location Rooms">
+                                            <input type="text" class="form-control" id="location-rooms" name="location_rooms" placeholder="Enter Location Rooms" value="<?php echo esc_attr($locations_data['location_rooms_number']); ?>">
                                         </div>
-
-                                        <!-- Contact Form Fields -->
-
-                                        <div class="form-group">
-                                            <label for="contact-phone">Phone Number:</label>
-                                            <input type="tel" class="form-control" id="contact-phone" name="contact_phone" placeholder="Enter phone number">
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="contact-email">Email:</label>
-                                            <input type="email" class="form-control" id="contact-email" name="contact_email" placeholder="Enter email">
-                                        </div>
-
 
                                     </form>
-
-
 
                                 </div>
                                 <div class="modal-footer">
@@ -329,93 +340,91 @@ $location_post_id = get_the_ID();
                         </div>
                     </div>
 
-
-
                 </div>
 
                 <div class="Locatiegegevens-item">
 
-
-
                     <?php
 
 
 
 
-
-                    $desc_title_1 = get_field('alinea_1_titel');
-                    $desc_location_data = get_field('Locatiegegevens');
-
-                    // echo '<pre>';
-                    // print_r($desc_location_data);
-                    // echo '</pre>';
-
-                    if ($desc_title_1 && $desc_location_data) {
-                        $locatiegegevens_items = $desc_location_data['locatiegegevens_items'];
-                    
-                        if (!empty($locatiegegevens_items)) {
-                            echo '<ul class="list-unstyled mb-3">';
-                            
-                            foreach ($locatiegegevens_items as $index => $desc_location_item) {
-                                echo '<li>';
-                                
-
-                                if ($desc_location_item['locatiegegevens_icon']) {
-                                    echo $desc_location_item['locatiegegevens_icon'];
-                                }
-
-                                echo '  ';
-
-                                // Display the name and an Edit button
-                                if ($desc_location_item['locatiegegevens_name']) {
-                                    echo '<span class="locatiegegevens_name mb-3" id="locatiegegevens_name_' . $index . '">' . esc_html($desc_location_item['locatiegegevens_name']) . '</span>';
-                                }
-                                
-                                echo '</li>';
-                            }
-                            
-                            echo '</ul>';
-                        }
-                    }
-              
                     ?>
+                    <p class="location-name-icon"><i class="fas fa-location-pin"></i> <?php echo ' '.  $locations_data['location_name_text']; ?></p>
+                    <p class="location-name-icon"><i class="fas fa-globe"></i> <?php echo ' '.  $locations_data['location_website_url']; ?></p>
+                    <p class="location-name-icon"><i class="fas fa-users"></i> <?php echo ' '.  $locations_data['location_persons_number']; ?></p>
+                    <p class="location-name-icon"> <i class="fas fa-building"></i> <?php echo ' '. $locations_data['location_rooms_number']; ?></p>
+
+
 
                 </div>
 
-                <div class="Contactgegevens-item">
+                <div class="">
 
-                    <h3>Contactgegevens</h3>
+                    <div class="contact-header">
+                        <h3 class="d-inline">Contactgegevens </h3>
+                        <!-- Button to trigger the modal -->
+                        <button class="btn d-inline btn-primary border-0 btn-lg" id="contact-data">
+                            Edit <i class="fas fa-edit"></i>
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="contactEdit" tabindex="-1" role="dialog" aria-labelledby="locationEditModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+
+                                    <div class="modal-body">
+
+                                        <form method="POST" action="">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title text-dark" id="locationEditModalLabel">Edit Contact Info's</h5>
+                                                <input type="submit" name="update_location_names" value="Save Changes" class="btn btn-primary">
+                                            </div>
+
+
+                                            <!-- Contact Form Fields -->
+
+                                            <div class="form-group">
+                                                <label for="contact-phone">Phone Number:</label>
+                                                <input type="tel" class="form-control" id="contact-phone" name="contact_phone" value="<?php echo $contacts_info['location_phone']; ?>" placeholder="Enter phone number">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="contact-email">Email:</label>
+                                                <input type="email" class="form-control" id="contact-email" name="contact_email" value="<?php echo $contacts_info['location_email']; ?>" placeholder="Enter email">
+                                            </div>
+
+
+                                        </form>
 
 
 
-                    <?php
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    $contact_location_data = get_field('Contactgegevens');
-                    $contactgegevens_items = $contact_location_data['contactgegevens_items'];
 
-                    echo '<ul class="list-unstyled mb-3" >';
-                    foreach ($contactgegevens_items as $contact_location_item) {
 
-                        // var_dump($contact_location_item);
+                    </div>
 
-                        echo '<li>';
+                    <div class="Contactgegevens-item">
 
-                        // echo $desc_location_item['contactgegevens_image'];
-                        // Display the image on the left
-                        if ($contact_location_item['contactgegevens_icon']) {
-                            echo $contact_location_item['contactgegevens_icon'];
-                        }
-                        echo ' ';
-                        // Display the other field value on the right
-                        if ($contact_location_item['contactgegevens_name']) {
-                            echo '<span class="contactgegevens_name mb-3">' . esc_html($contact_location_item['contactgegevens_name']) . '</span>';
-                        }
+                        <?php
 
-                        echo '</li>';
-                    }
-                    echo '</ul>';
 
-                    ?>
+                        $contacts_info = get_field('contacts_info');
+
+                        ?>
+                        <p><i class="fas fa-phone"></i> <?php echo $contacts_info['location_phone']; ?></p>
+                        <p><i class="fas fa-envelope"></i> <?php echo $contacts_info['location_email']; ?></p>
+
+                    </div>
                 </div>
 
                 <!-- You can add other post-related information here -->
@@ -424,7 +433,7 @@ $location_post_id = get_the_ID();
 
             <div class="book-now-for-manager-section">
                 <div class="p-3">
-                    <a href="http://localhost:10038/booking/?location_id=<?php the_ID(); ?>" class="btn btn-success text-white h3">Book Now</a>
+                    <a href="<?php echo get_home_url(); ?>/booking/?location_id=<?php the_ID(); ?>" class="btn btn-primary text-white h2">Book Now</a>
                 </div>
             </div>
         </div>
