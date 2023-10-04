@@ -12,9 +12,7 @@ echo custom_breadcrumbs();
 <div class="row">
 
     <div class="col-md-7 ">
-
         <div class="chart-part">
-
             <div class="form-group">
                 <label for="yearDropdown" class="col-form-label">Selecteer jaar:</label>
                 <div class="">

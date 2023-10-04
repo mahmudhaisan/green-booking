@@ -33,16 +33,17 @@
                             $current_user_id = get_current_user_id(); // Replace with your method to get the current user's name
 
                             // Query to retrieve the latest 10 records for the current user ordered by event date
-                            $query = "SELECT event_date, user_name, total_trees FROM $table_name WHERE ID = $current_user_id ORDER BY event_date DESC LIMIT 10";
+                            $query = "SELECT * FROM $table_name WHERE created_by= $current_user_id ORDER BY created_time DESC";
 
                             $results = $wpdb->get_results($query);
 
+        
                             // Check if there are results
                             if ($results) {
                                 foreach ($results as $result) {
                                     echo '<tr>';
-                                    echo '<td>' . date('Y-m-d', strtotime($result->event_date)) . '</td>';
-                                    echo '<td>' . $result->user_name . '</td>';
+                                    echo '<td>' . date('Y-m-d', strtotime($result->created_time)) . '</td>';
+                                    echo '<td>' . $result->created_for . '</td>';
                                     echo '<td>' . $result->total_trees . '</td>';
                                     echo '</tr>';
                                 }
@@ -107,9 +108,7 @@
                             <h5 class="card-title"><?php echo esc_html($location_title); ?></h5>
 
                             <?php
-
                             $locations_data = get_field('locations_data');
-
                             ?>
                             <p><i class="fas fa-globe"></i> <?php echo $locations_data['location_name_text']; ?></p>
                             <p><i class="fas fa-link"></i> <?php echo $locations_data['location_website_url']; ?></p>
@@ -126,6 +125,8 @@
                 wp_reset_postdata();
             else :
                 echo 'No locations found.';
+
+                
             endif;
 ?>
 

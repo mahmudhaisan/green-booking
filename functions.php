@@ -192,6 +192,7 @@ add_action('init', 'remove_shop_manager_role');
 function custom_login_redirect($redirect_to, $request, $user)
 {
     // Check if the user is an admin and redirect to the admin dashboard
+
     if (is_array($user->roles) && in_array('administrator', $user->roles)) {
         return admin_url();
     } else {
@@ -283,9 +284,15 @@ function update_map_lat_lng_location($post_id) {
 
     // Check if the ACF field 'google_map_location' exists and has lat and lng values
     $location_data = get_field('google_map_location', $post_id);
+
+
+
+
     if (!$location_data || !isset($location_data['lat']) || !isset($location_data['lng'])) {
         return; // Location data is missing or incomplete, exit the function
     }
+
+
 
     $location_lat = $location_data['lat'];
     $location_lng = $location_data['lng'];
@@ -327,4 +334,44 @@ function calculateDistance($lat1, $lng1, $lat2, $lng2)
     return $distance;
 }
 
-// Rest of your code follows...
+function calculateTreeStatistics() {
+    global $wpdb;
+
+    $locations_count = wp_count_posts('locations')->publish;
+    $table_name = $wpdb->prefix . 'booking_options';
+    $currentDateTime = new DateTime();
+    $currentYear = $currentDateTime->format('Y');
+
+    $query = "SELECT * FROM $table_name";
+    $results = $wpdb->get_results($query);
+
+    $plantedTreesThisWeek = 0;
+    $plantedTreesThisYear = 0;
+    $plantedTreesSinceStart = 0;
+
+    if (!empty($results)) {
+        foreach ($results as $result) {
+            $createdTime = new DateTime($result->created_time);
+            $diff = $currentDateTime->diff($createdTime);
+
+            if ($diff->days <= 7 && $createdTime->format('N') <= $currentDateTime->format('N')) {
+                $plantedTreesThisWeek += $result->total_trees;
+            }
+
+            if ($createdTime->format('Y') == $currentYear) {
+                $plantedTreesThisYear += $result->total_trees;
+            }
+
+            $plantedTreesSinceStart += $result->total_trees;
+        }
+    }
+
+
+
+    return array(
+        'locations_count' => $locations_count,
+        'planted_trees_this_week' => $plantedTreesThisWeek,
+        'planted_trees_this_year' => $plantedTreesThisYear,
+        'planted_trees_since_start' => $plantedTreesSinceStart,
+    );
+}

@@ -356,6 +356,7 @@ jQuery(document).ready(function ($) {
 
         if (isValid) {
             var locationName = $('#location-select-name').val();
+            var createdFor = $('#contactperson').val();
             var locationUserTotal = $('#total-user-amount').text();
             var totalTrees = $('#planted-tree-count').text();
             var selectedDate = $("#datumEventum").val();
@@ -380,7 +381,9 @@ jQuery(document).ready(function ($) {
                         locationName: locationName,
                         locationUserTotal: locationUserTotal,
                         totalTrees: totalTrees,
-                        selectedDate: selectedDate
+                        selectedDate: selectedDate,
+                        createdFor: createdFor,
+
                     },
                     success: function (response) {
                         var currentHost = window.location.host;
@@ -459,121 +462,143 @@ jQuery(document).ready(function ($) {
 
 
 
-    $('#location-person-filter').on('input', function () {
 
-        // alert('working');
+    $('#location-person-filter, #minimum-person-filter, .location-facility-checkbox').on('input change', function () {
         $('#loading-spinner').show();
-        // Get the form data
+        var ajaxUrl = greenbooking_plugin.ajaxurl;
         var personQuantityValue = $('#location-person-filter').val();
+        var minimumPersonQuantityValue = $('#minimum-person-filter').val();
 
-        // Get the AJAX URL from the data attribute
-        var ajaxUrl = greenbooking_plugin.ajaxurl;
-
-        // Make the AJAX request
-        $.ajax({
-            type: 'post',
-            url: ajaxUrl,
-            data: {
-                action: 'custom_location_filter',
-                personQuantityValue: personQuantityValue,
-            },
-            success: function (response) {
-
-                // console.log(response);
-                // Update the content with the AJAX response
-                $('.archieve-right-items .row').html(response);
-            },
-            complete: function () {
-                // Hide the loading spinner after the AJAX request is complete
-                $('#loading-spinner').hide();
-            }
-        });
-    });
-
-
-    $('#minimum-person-filter').on('input', function () {
-
-        // alert('working');
-        $('#loading-spinner').show();
-        // Get the form data
-        var personQuantityValue = $(this).val();
-
-
-        console.log(personQuantityValue);
-
-        // Get the AJAX URL from the data attribute
-        var ajaxUrl = greenbooking_plugin.ajaxurl;
-
-        // Make the AJAX request
-        $.ajax({
-            type: 'post',
-            url: ajaxUrl,
-            data: {
-                action: 'minimum_person_filter',
-                minimumPersonQuantityValue: personQuantityValue,
-            },
-            success: function (response) {
-
-                console.log(response);
-                // Update the content with the AJAX response
-                $('.archieve-right-items .row').html(response);
-            }, 
-            complete : function(response){
-                $('#loading-spinner').hide();
-            }
-        });
-    });
-
-
-    $('.location-facility-checkbox').change(function () {
-
-        $('#loading-spinner').show();
-        // Get the AJAX URL from the data attribute
-        var ajaxUrl = greenbooking_plugin.ajaxurl;
-        // Get selected checkboxes
+        // Get selected checkboxes for facilities
         var selectedFacilities = [];
         $('.location-facility-checkbox:checked').each(function () {
             selectedFacilities.push($(this).val());
         });
 
-        // AJAX request to filter the posts
         $.ajax({
-            url: ajaxUrl, // Use the WordPress AJAX URL
-            type: 'POST',
+            type: 'post',
+            url: ajaxUrl,
             data: {
-                action: 'filter_custom_facilities',
+                action: 'combined_location_filter',
+                personQuantityValue: personQuantityValue,
+                minimumPersonQuantityValue: minimumPersonQuantityValue,
                 facilities: selectedFacilities,
             },
             success: function (response) {
-
-
-                // console.log(response);
-                // Update the post container with the filtered posts
+                $('#loading-spinner').hide();
+                // Update the content with the AJAX response
                 $('.archieve-right-items .row').html(response);
             },
-            complete : function () {
+            complete: function () {
                 $('#loading-spinner').hide();
-
             }
         });
     });
 
 
 
-
-
-    // Function to calculate radius based on location (you can implement your own logic)
-    function calculateRadiusBasedOnLocation(latitude, longitude) {
-        // Implement your logic here to calculate the radius dynamically
-        // Example: You can use the Google Maps Distance Matrix API to calculate distances
-        // between locations and set an appropriate radius.
-        // Return the calculated radius in kilometers.
-        return 10; // Default radius if no calculation is performed
-    }
+    function yearBasedChartData(){
 
     
+        var ajaxUrl = greenbooking_plugin.ajaxurl;
+        const yearDropdown = $('#yearDropdown');
+        const lineChartCanvas = $('#lineChart')[0].getContext('2d');
+        const currentYear = new Date().getFullYear(); // Get the current year
+        const currentMonth = new Date().getMonth(); // Get the current month (0-based index)
+    
+        // Initialize the chart with an empty dataset
+        const lineChart = new Chart(lineChartCanvas, {
+            type: 'line',
+            data: {
+                labels: [], // Months will go here
+                datasets: [],
+            },
+            options: {
+                scales: {
+                    x: {
+                        grid: {
+                            drawOnChartArea: false, // Hide the x-axis grid lines
+                        },
+                    },
+                    y: {
+                        grid: {
+                            drawOnChartArea: false, // Hide the y-axis grid lines
+                        },
+                        suggestedMin: 0, // Ensure the y-axis starts from 0
+                    },
+                },
+            },
+        });
+    
+        // Function to update chart data based on the selected year
+        function updateChartData(selectedYear) {
+            // Clear existing datasets
+            lineChart.data.datasets = [];
+    
+            // Use AJAX to fetch the yearData from your PHP function
+            $.ajax({
+                type: 'POST',
+                url: ajaxUrl, // Replace with the URL to your PHP function
+                data: {
+                    action: 'get_year_data', // Replace with the action name used in your PHP function
+                    selectedYear: selectedYear,
+                },
+                success: function (response) {
+                  
+                    if (response && response.yearData) {
 
+                        
+                        // Use the fetched yearData to update the chart
+                        const yearDataForSelectedYear = response.yearData[selectedYear];
+    
+        
+                        // Extract months and counts from the yearDataForSelectedYear
+                        const months = Object.keys(yearDataForSelectedYear);
+                        const countsData = Object.values(yearDataForSelectedYear);
+    
+                        // Create a dataset with the custom data
+                        const dataset = {
+                            label: selectedYear.toString(),
+                            data: countsData,
+                            borderColor: '#0c474f',
+                            fill: false,
+                            pointRadius: 5,
+                        };
+    
+                        // Add the dataset to the chart
+                        lineChart.data.labels = months;
+                        lineChart.data.datasets.push(dataset);
+    
+                        // Update the chart
+                        lineChart.update();
+                    }
+                },
+            });
+        }
+    
+        // Populate the year dropdown with years since 2020
+        for (let year = 2022; year <= currentYear; year++) {
+            yearDropdown.append($('<option>', {
+                value: year,
+                text: year,
+            }));
+        }
+    
+        // Set the default selected year to the current year
+        yearDropdown.val(currentYear);
+    
+        // Event listener to update chart when the year dropdown changes
+        yearDropdown.on('change', function () {
+            const selectedYear = yearDropdown.val();
+            updateChartData(selectedYear);
+        });
+    
+        // Initial chart setup for the current year and month
+        updateChartData(currentYear);
+    };
+    
 
+    yearBasedChartData();
 
 });
 

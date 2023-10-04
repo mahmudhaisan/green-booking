@@ -144,7 +144,7 @@ function locations_single_template($template)
 
 
 
-  
+
     // Get the current user's ID.
     $current_user_id = get_current_user_id();
 
@@ -216,7 +216,8 @@ function create_booking_options_table()
     $sql = "CREATE TABLE $table_name (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         location_name varchar(255) NOT NULL,
-        user_name varchar(255) NOT NULL,
+        created_by varchar(254) NOT NULL,
+        created_for varchar(255) NOT NULL,
         total_amount decimal(10, 2) NOT NULL,
         total_trees int(11) NOT NULL,
         event_date datetime NOT NULL,
@@ -241,14 +242,6 @@ function result_locaties_page_cb()
 }
 
 
-add_shortcode('result-boekers-page', 'result_bookers_page_cb');
-
-function result_bookers_page_cb()
-{
-
-    include GRBP_PLUGINS_PATH . '/views/results/results-bookers.php';
-}
-
 
 add_shortcode('locatie-login', 'locatie_login_cb');
 
@@ -266,7 +259,108 @@ add_shortcode('all-bookings-details', 'all_bookings_details_cb');
 
 function all_bookings_details_cb()
 {
-
-
     include GRBP_PLUGINS_PATH . '/views/bookings/all-bookings.php';
+}
+
+
+
+
+
+
+add_shortcode('user_trees_booking_calc', 'user_trees_booking_calc');
+
+function user_trees_booking_calc()
+{
+    $treeStatistics = calculateTreeStatistics();
+    $locations_count = $treeStatistics['locations_count'];
+    $plantedTreesThisWeek = $treeStatistics['planted_trees_this_week'];
+    $plantedTreesThisYear = $treeStatistics['planted_trees_this_year'];
+    $plantedTreesSinceStart = $treeStatistics['planted_trees_since_start'];
+
+?>
+
+    <div class="row text-white mt-2">
+
+        <!-- Locations count column -->
+        <div class="col-md-3 text-center">
+            <div class="d-flex justify-content-center align-items-center">
+                <i class="fas fa-map-marker fa-2x"></i>
+            </div>
+            <p class="h3 mt-2"><?php echo $locations_count; ?></p>
+            <p class="h5 text-center">Aangesloten locaties</p>
+        </div>
+
+        <!-- Planted Trees This Week column -->
+        <div class="col-md-3 text-center">
+            <div class="d-flex justify-content-center align-items-center">
+                <i class="fa fa-calendar-days fa-2x"></i>
+            </div>
+            <p class="h3 mt-2"><?php echo $plantedTreesThisWeek; ?></p>
+            <p class="h5 text-center">Geplante bomen deze week</p>
+        </div>
+
+        <!-- Planted Trees This Year column -->
+        <div class="col-md-3 text-center">
+            <div class="d-flex justify-content-center align-items-center">
+                <i class="fa-solid fa-calendar-check fa-2x"></i>
+            </div>
+            <p class="h3 mt-2"><?php echo $plantedTreesThisYear; ?></p>
+            <p class="h5 text-center">Geplante bomen dit jaar</p>
+        </div>
+
+        <!-- Planted Trees Since Start column -->
+        <div class="col-md-3 text-center">
+            <div class="d-flex justify-content-center align-items-center">
+                <i class="fa-regular fa-calendar-plus fa-2x"></i>
+            </div>
+            <p class="h3 mt-2"><?php echo $plantedTreesSinceStart; ?></p>
+            <p class="h5 text-center">Geplante bomen sinds start</p>
+        </div>
+
+    </div>
+
+
+<?php }
+
+
+add_shortcode('year_data_for_chart', 'year_data_for_chart');
+function year_data_for_chart()
+{
+    global $wpdb;
+
+    // Define the table name
+    $table_name = $wpdb->prefix . 'booking_options';
+
+    // Query to retrieve data grouped by year and month
+    $query = "
+    SELECT 
+        YEAR(created_time) AS year,
+        MONTH(created_time) AS month,
+        SUM(total_trees) AS total_trees
+    FROM 
+        $table_name
+    GROUP BY 
+        YEAR(created_time), MONTH(created_time)
+    ORDER BY 
+        year ASC, month ASC
+    ";
+
+    $results = $wpdb->get_results($query, OBJECT);
+    $yearData = array();
+
+    foreach ($results as $row) {
+        $year = $row->year;
+        $month = date('F', mktime(0, 0, 0, $row->month, 1, $year)); // Convert month number to month name
+        $total_trees = $row->total_trees;
+
+        // Add the data to the $yearData array
+        if (!isset($yearData[$year])) {
+            $yearData[$year] = array();
+        }
+        $yearData[$year][$month] = $total_trees;
+    }
+
+    echo '<pre>';
+    print_r($yearData);
+    echo '</pre>';
 }

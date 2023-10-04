@@ -182,8 +182,16 @@ get_header(); // Include your header template
 
                     $locations_data = get_field('locations_data');
 
+
+                                       
+                    $map_location_data = get_field('google_map_location' );
+
+               
+
+                    // exit;
+
                     ?>
-                    <p class="location-name-icon mt-3"><i class="fas fa-location-pin"></i> <?php echo $locations_data['location_name_text']; ?></p>
+                    <p class="location-name-icon mt-3"><i class="fas fa-location-pin"></i> <?php echo $map_location_data['address']; ?></p>
                     <p class="location-name-icon"><i class="fas fa-globe"></i> <?php echo  $locations_data['location_website_url']; ?></p>
                     <p class="location-name-icon"><i class="fas fa-users"></i> <?php echo $locations_data['location_persons_number']; ?></p>
                     <p class="location-name-icon"><i class="fas fa-building"></i> <?php echo $locations_data['location_rooms_number']; ?></p>

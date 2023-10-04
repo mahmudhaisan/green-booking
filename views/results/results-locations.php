@@ -12,9 +12,7 @@ echo custom_breadcrumbs();
 <div class="row">
 
     <div class="col-md-7 ">
-
         <div class="chart-part">
-
             <div class="form-group">
                 <label for="yearDropdown" class="col-form-label">Selecteer jaar:</label>
                 <div class="">
@@ -27,126 +25,6 @@ echo custom_breadcrumbs();
             <div class="">
                 <canvas id="lineChart" width="600" height="400"></canvas>
             </div>
-
-
-            <script>
-                jQuery(document).ready(function($) {
-                    const yearDropdown = document.getElementById('yearDropdown');
-                    const lineChartCanvas = document.getElementById('lineChart').getContext('2d');
-                    const currentYear = new Date().getFullYear(); // Get the current year
-                    const currentMonth = new Date().getMonth(); // Get the current month (0-based index)
-
-                    // Sample data structure for storing data by month for multiple years
-                    const yearData = {
-                        2022: {
-                            January: 50,
-                            February: 65,
-                            March: 80,
-                            April: 45,
-                            May: 75,
-                            June: 60,
-                            July: 65,
-                            August: 65,
-                            September: 65,
-                            October: 165,
-                            November: 65,
-                            December: 265,
-                        },
-                        2023: {
-                            January: 55,
-                            February: 70,
-                            March: 75,
-                            April: 50,
-                            May: 80,
-                            June: 65,
-                            July: 65,
-                            August: 165,
-                            September: 65,
-                            October: 265,
-                            November: 65,
-                            December: 265,
-                        },
-                        // Add more years and data as needed
-                    };
-
-                    // Initialize the chart with an empty dataset
-                    const lineChart = new Chart(lineChartCanvas, {
-                        type: 'line',
-                        data: {
-                            labels: [], // Months will go here
-                            datasets: [],
-                        },
-                        options: {
-                            scales: {
-                                x: {
-                                    grid: {
-                                        drawOnChartArea: false, // Hide the x-axis grid lines
-                                    },
-                                },
-                                y: {
-                                    grid: {
-                                        drawOnChartArea: false, // Hide the y-axis grid lines
-                                    },
-                                    suggestedMin: 0, // Ensure the y-axis starts from 0
-                                },
-                            },
-                        },
-                    });
-
-                    // Function to update chart data based on the selected year
-                    function updateChartData(selectedYear) {
-                        // Clear existing datasets
-                        lineChart.data.datasets = [];
-
-                        // Get the data for the selected year
-                        const yearDataForSelectedYear = yearData[selectedYear];
-
-                        if (yearDataForSelectedYear) {
-                            // Extract months and counts from the yearDataForSelectedYear
-                            const months = Object.keys(yearDataForSelectedYear);
-                            const countsData = Object.values(yearDataForSelectedYear);
-
-                            // Create a dataset with the custom data
-                            const dataset = {
-                                label: selectedYear.toString(),
-                                data: countsData,
-                                borderColor: '#0c474f',
-                                fill: false,
-                                pointRadius: 5,
-                            };
-
-                            // Add the dataset to the chart
-                            lineChart.data.labels = months;
-                            lineChart.data.datasets.push(dataset);
-                        }
-
-                        // Update the chart
-                        lineChart.update();
-                    }
-
-                    // Populate the year dropdown with years since 2020
-                    for (let year = 2022; year <= currentYear; year++) {
-                        const option = document.createElement('option');
-                        option.value = year;
-                        option.textContent = year;
-                        yearDropdown.appendChild(option);
-                    }
-
-                    // Set the default selected year to the current year
-                    yearDropdown.value = currentYear;
-
-                    // Event listener to update chart when the year dropdown changes
-                    yearDropdown.addEventListener('change', () => {
-                        const selectedYear = yearDropdown.value;
-                        updateChartData(selectedYear);
-                    });
-
-                    // Initial chart setup for the current year and month
-                    updateChartData(currentYear);
-                });
-            </script>
-
-
 
         </div>
     </div>

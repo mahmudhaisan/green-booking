@@ -309,6 +309,7 @@ $contacts_info = get_field('contacts_info');
                                         </div>
                                         <!-- Location Form Fields -->
                                         <div class="form-group">
+
                                             <label for="location-name">Location Name:</label>
                                             <input type="text" class="form-control" id="location-name" name="location_name" placeholder="Enter location name" value="<?php echo esc_attr($locations_data['location_name_text']); ?>">
                                         </div>
@@ -345,15 +346,13 @@ $contacts_info = get_field('contacts_info');
                 <div class="Locatiegegevens-item">
 
                     <?php
-
-
-
-
+                    
+                    $map_location_data = get_field('google_map_location');
                     ?>
-                    <p class="location-name-icon"><i class="fas fa-location-pin"></i> <?php echo ' '.  $locations_data['location_name_text']; ?></p>
-                    <p class="location-name-icon"><i class="fas fa-globe"></i> <?php echo ' '.  $locations_data['location_website_url']; ?></p>
-                    <p class="location-name-icon"><i class="fas fa-users"></i> <?php echo ' '.  $locations_data['location_persons_number']; ?></p>
-                    <p class="location-name-icon"> <i class="fas fa-building"></i> <?php echo ' '. $locations_data['location_rooms_number']; ?></p>
+                    <p class="location-name-icon"><i class="fas fa-location-pin"></i> <?php echo ' ' .  $map_location_data['address']; ?></p>
+                    <p class="location-name-icon"><i class="fas fa-globe"></i> <?php echo ' ' .  $locations_data['location_website_url']; ?></p>
+                    <p class="location-name-icon"><i class="fas fa-users"></i> <?php echo ' ' .  $locations_data['location_persons_number']; ?></p>
+                    <p class="location-name-icon"> <i class="fas fa-building"></i> <?php echo ' ' . $locations_data['location_rooms_number']; ?></p>
 
 
 
